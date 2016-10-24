@@ -1,0 +1,6 @@
+{
+  "name": "poly-vote",
+  "short_name": "poly-vote",
+  "start_url": "/",
+  "display": "standalone"
+}

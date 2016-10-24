@@ -1,0 +1,30 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="vote-contest.html">
+
+<dom-module id="poly-vote-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <vote-contest title="titulo" date="24/10/2016" 
+                  description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.">
+    </vote-contest>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'poly-vote-app',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'poly-vote-app',
+        },
+      },
+
+    });
+  </script>
+</dom-module>

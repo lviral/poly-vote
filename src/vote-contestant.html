@@ -1,0 +1,88 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+
+<dom-module id="vote-contestant">
+  <template>
+    <style>
+        :host {
+            display: block;
+            position: relative;
+            height: 350px;
+            border: 2px solid black;
+            width: 49%;
+        }
+        #example-sizing-cover {
+            width: 100%;
+            height: 350px;
+            background: #ddd;
+        }
+        #votes-bar {
+            position: absolute;
+            width: 20%;
+            height: 250px;
+            background-color: darkcyan;
+            right: 0px;
+            bottom: 0px;
+            opacity: 0.5;
+        }
+        #selection {
+            position: absolute;
+            bottom: 5px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .title {
+            position: absolute;
+            bottom: 30px;
+        }
+        .right {
+            right: 10px;
+            text-align: right;
+        }
+        .left {
+            left: 10px;
+            text-align: left;
+        }
+        .bar-right {
+            right: 0px;
+        }
+        .bar-left {
+            left: 0px;
+        }
+        paper-checkbox {
+            --paper-checkbox-size: 30px;
+        }
+    </style>
+    <iron-image sizing="cover" id="example-sizing-cover" alt="The Polymer logo." src="{{image}}"></iron-image>
+    <div class$="title {{textAlign}}">{{name}}<br>{{votes}}<br>votes</div>
+    <div id="votes-bar" class$="{{barAlign}}"></div>
+    <div id="selection"><paper-checkbox></paper-checkbox></div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'vote-contestant',
+      properties: {
+          name: String,
+          votes: {
+              type: Number,
+              value: 0
+          },
+          image: String,
+          color: String,
+          textAlign: {
+              type: String,
+              value: 'right'
+          },
+          barAlign: {
+              type: String,
+              value: 'bar-right'
+          }
+      }
+
+    });
+  </script>
+</dom-module>

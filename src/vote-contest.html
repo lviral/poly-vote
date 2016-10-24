@@ -1,0 +1,44 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="vote-contestant.html">
+
+<dom-module id="vote-contest">
+  <template>
+    <style>
+        :host {
+            display: block;
+            width: 100%;
+        }
+        .text {
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+        }
+    </style>
+    <div class="text">{{title}}</div>
+    <vote-contestant image="http://placehold.it/500x500" name="Contestant 1" bar-align="bar-left"  text-align="left" style="float:right;"></vote-contestant>
+    <vote-contestant image="http://placehold.it/300x300" name="Contestant 2"></vote-contestant>
+    <br>
+    <div class="text">{{date}}</div>
+    <br>
+    <div class="text">{{description}}</div>
+  </template>
+
+  <script>
+    Polymer({
+        
+      is: 'vote-contest',
+      properties: {
+          title: String,
+          date: {
+              type: String,
+              value: ''
+          },
+          description: {
+              type: String,
+              value: ''
+          }
+      }
+        
+    });
+  </script>
+</dom-module>

@@ -1,0 +1,15 @@
+[{
+    "id": "0",
+    "title": "Titulo",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "date": "24/10/2016",
+    "contestants": [{
+        "name": "Participante 1",
+        "votes": 0,
+        "image": ""
+    }, {
+        "name": "Participante 2",
+        "votes": 0,
+        "image": ""
+    }]
+}]
