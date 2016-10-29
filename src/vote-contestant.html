@@ -1,6 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-image/iron-image.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 
 <dom-module id="vote-contestant">
   <template>
@@ -8,57 +10,67 @@
         :host {
             display: block;
             position: relative;
-            height: 350px;
-            border: 2px solid black;
-            width: 49%;
+            height: 300px;
+            width: 50%;
         }
-        #example-sizing-cover {
+        .container {
             width: 100%;
-            height: 350px;
-            background: #ddd;
+            height: 100%;
         }
-        #votes-bar {
+        .right {
+            right: 25px;
+            text-align: left;
+            border-left: 2px solid gray;
+        }
+        .left {
+            left: 25px;
+            text-align: right;
+            border-right: 2px solid gray;
+        }
+        .bar {
             position: absolute;
-            width: 20%;
+            width: 10%;
             height: 250px;
-            background-color: darkcyan;
-            right: 0px;
             bottom: 0px;
             opacity: 0.5;
+            border-bottom: 3px solid gray;
         }
-        #selection {
-            position: absolute;
-            bottom: 5px;
-            width: 100%;
-            margin: 0 auto;
-            text-align: center;
+        .right .bar {
+            left: 0px;
+        }
+        .left .bar {
+            right: 0px;
         }
         .title {
             position: absolute;
-            bottom: 30px;
+            bottom: 50px;
+            font-size: x-large;
         }
-        .right {
-            right: 10px;
-            text-align: right;
+        .right .title {
+            left: 25px;
         }
-        .left {
-            left: 10px;
-            text-align: left;
+        .left .title {
+            right: 25px;
         }
-        .bar-right {
-            right: 0px;
+        .votes {
+            font-size: medium;
         }
-        .bar-left {
-            left: 0px;
+        .image-cover {
+            width: 100%;
+            height: 300px;
+            background: #ddd;
         }
-        paper-checkbox {
-            --paper-checkbox-size: 30px;
+        paper-fab {
+            margin: 0 auto;
+            bottom: 25px;
         }
     </style>
-    <iron-image sizing="cover" id="example-sizing-cover" alt="The Polymer logo." src="{{image}}"></iron-image>
-    <div class$="title {{textAlign}}">{{name}}<br>{{votes}}<br>votes</div>
-    <div id="votes-bar" class$="{{barAlign}}"></div>
-    <div id="selection"><paper-checkbox></paper-checkbox></div>
+    <div class$="container {{float}}">
+        <iron-image sizing="cover" class="image-cover" alt="The Polymer logo." src="{{image}}"></iron-image>
+        <div style="color: {{textColor}}" class$="title {{textAlign}}">{{name}}<br>{{votes}}<br><span class="votes">votes</span></div>
+        <div style="background-color:{{barColor}}" class="bar"></div>
+        <paper-fab noink mini icon="favorite" title="heart" on-click="_recibirVoto"></paper-fab>
+    </div>
   </template>
 
   <script>
@@ -72,17 +84,24 @@
               value: 0
           },
           image: String,
-          color: String,
-          textAlign: {
+          textColor: {
               type: String,
-              value: 'right'
+              value: '#fff'
           },
-          barAlign: {
+          barColor: {
               type: String,
-              value: 'bar-right'
+              value: '#e67c73'
+          },
+          float: {
+              type: String,
+              value: 'left'
           }
+      },
+      _recibirVoto: function(e) {
+        e.target.style.color = '#c53929';
+        this.votes++;
+        this.fire('get-vote');
       }
-
     });
   </script>
 </dom-module>
