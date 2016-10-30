@@ -1,0 +1,50 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+
+<dom-module id="vote-contest-list">
+  <template>
+    <style>
+        :host {
+            display: block;
+            width: 100%;
+            color: gray;
+            margin: 0 auto;
+        }
+        paper-item {
+            border-bottom: 1px solid #ECECEC;
+            border-top: 1px solid #ECECEC;
+        }
+    </style>
+      
+    <firebase-query
+        id="query"
+        app-name="polyvote"
+        path="[[dbPath]]"
+        data="{{data}}">
+    </firebase-query>
+
+      <p style="margin-left:10px;">Surverys</p>
+      
+    <template is="dom-repeat" items="{{data}}" as="survey">
+      <paper-item>[[survey.title]]</paper-item>
+    </template>
+      
+  </template>
+
+  <script>
+    Polymer({
+        
+      is: 'vote-contest-list',
+      properties: {
+          user: Object,
+          dbPath: {
+              type: String,
+              computed: '_setDbPath(user)'
+          }
+      },
+      _setDbPath: function(user) {
+          return '/users/' + this.user.uid + '/surveys';
+      }
+    });
+  </script>
+</dom-module>

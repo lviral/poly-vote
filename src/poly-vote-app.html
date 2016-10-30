@@ -1,5 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../bower_components/note-app-elements/na-toolbar.html">
+<link rel="import" href="../bower_components/note-app-elements/na-login.html">
+<link rel="import" href="vote-editor.html">
+<link rel="import" href="vote-contest-list.html">
 <link rel="import" href="vote-contest.html">
 
 <dom-module id="poly-vote-app">
@@ -23,34 +27,48 @@
       #social-net-links span{
           padding: 25px;
       }
+      paper-fab {
+        position: absolute;
+        bottom: 1em;
+        right: 1em;
+      }
     </style>
       
-    <firebase-app auth-domain="poly-vote-71ccc.firebaseapp.com"
+    <firebase-app name="polyvote"
+          auth-domain="poly-vote-71ccc.firebaseapp.com"
           database-url="https://poly-vote-71ccc.firebaseio.com"
           api-key="AIzaSyCAct49Wg5EYLluplC9YNKodnYRHBUUfoI">
     </firebase-app>
-    
-    <vote-contest title="titulo" date="24/10/2016" 
+      
+    <firebase-auth id="auth" app-name="polyvote" provider="google" signed-in="{{signedIn}}" user="{{user}}"></firebase-auth>
+    <na-toolbar signed-in="[[signedIn]]" on-sign-out="signOut"></na-toolbar>
+    <na-login on-sign-in="signIn" signed-in="[[signedIn]]" disabled="[[!online]]"></na-login>
+    <vote-editor user="{{user}}" hidden$="{{hiddenEditor}}"></vote-editor>
+    <vote-contest-list user="{{user}}" hidden$="{{hiddenList}}"></vote-contest-list>
+
+    <paper-fab icon="add" on-tap="create" disabled="[[!online]]" aria-label="Add survey"></paper-fab>
+    <!--<vote-contest title="titulo" date="24/10/2016" 
                   description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.">
     </vote-contest>
     <div id="social-net-links">
         <span>FACEBOOK</span>
         <span>TWITTER</span>
         <span>INSTAGRAM</span>
-    </div>
+    </div>-->
   </template>
 
   <script>
     Polymer({
 
       is: 'poly-vote-app',
-
       properties: {
-        prop1: {
-          type: String,
-          value: 'poly-vote-app',
-        },
+          hiddenEditor: true,
+          hiddenList: false
       },
+      behaviors: [Polymer.NoteAppBehavior],
+      signIn: function() {
+        this.$.auth.signInWithPopup();
+      }
 
     });
   </script>

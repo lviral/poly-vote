@@ -1,0 +1,75 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="vote-editor">
+  <template>
+    <style>
+        :host {
+            display: block;
+            width: 90%;
+            color: gray;
+            margin: 0 auto;
+        }       
+    </style>
+      
+    <firebase-document
+        id="survey"
+        app-name="polyvote"
+        path="[[dbPath]]">
+    </firebase-document>
+     
+    <br><span>New Survey</span>
+    <paper-input label="Title" value="{{title}}"></paper-input>
+    <paper-textarea label="Description" value="{{description}}"></paper-textarea>
+    <br><span>Contestants</span>
+    <paper-input label="Name" value="{{nameOne}}"></paper-input>
+    <br><span>VS</span>
+    <paper-input label="Name" value="{{nameTwo}}"></paper-input>
+    <paper-button raised on-click="_create">Publish</paper-button>
+      
+  </template>
+
+  <script>
+    Polymer({
+        
+      is: 'vote-editor',
+      properties: {
+          user: Object,
+          title: String,
+          description: String,
+          nameOne: String,
+          nameTwo: String,
+          dbPath: {
+              type: String,
+              computed: '_setDbPath(user)'
+          }
+      },
+      _create: function() {
+          this.surveyData = {
+              "contestants" : [ {
+                  "image" : "http://placehold.it/500x500",
+                  "name" : this.nameOne,
+                  "votes" : 0
+              }, {
+                  "image" : "http://placehold.it/700x700",
+                  "name" : this.nameTwo,
+                  "votes" : 0
+              } ],
+              "date" : (new Date()).toLocaleDateString(),
+              "description" : this.description,
+              "title" : this.title
+         };
+         
+         this.$.survey.data =  this.surveyData;
+         this.$.survey.save(this.dbPath).then(()=> {
+            this.$.survey.reset();
+         });
+      },
+      _setDbPath: function(user) {
+          return '/users/' + this.user.uid + '/surveys/';
+      }
+    });
+  </script>
+</dom-module>
