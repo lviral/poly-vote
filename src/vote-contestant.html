@@ -30,7 +30,7 @@
         .bar {
             position: absolute;
             width: 10%;
-            height: 250px;
+            /*height: 250px;*/
             bottom: 0px;
             opacity: 0.5;
             border-bottom: 3px solid gray;
@@ -66,10 +66,10 @@
         }
     </style>
     <div class$="container {{float}}">
-        <iron-image sizing="cover" class="image-cover" alt="The Polymer logo." src="{{image}}"></iron-image>
+        <iron-image sizing="cover" class="image-cover" alt="Contestant Cover." src="{{image}}"></iron-image>
         <div style="color: {{textColor}}" class$="title {{textAlign}}">{{name}}<br>{{votes}}<br><span class="votes">votes</span></div>
-        <div style="background-color:{{barColor}}" class="bar"></div>
-        <paper-fab noink mini icon="favorite" title="heart" on-click="_recibirVoto"></paper-fab>
+        <div style="background-color:{{barColor}}" class="bar" id="percentBar"></div>
+        <paper-fab id="voteButton" noink mini icon="favorite" title="heart"  on-click="_getVote"></paper-fab>
     </div>
   </template>
 
@@ -81,7 +81,8 @@
           name: String,
           votes: {
               type: Number,
-              value: 0
+              value: 0,
+              notify: true
           },
           image: String,
           textColor: {
@@ -95,12 +96,29 @@
           float: {
               type: String,
               value: 'left'
+          },
+          disabled: {
+              type: Boolean,
+              value: false,
+              observer: '_disabled'
+          },
+          percent: {
+              type: Number,
+              observer: '_updatePercent'
           }
       },
-      _recibirVoto: function(e) {
+      _getVote: function(e) {
         e.target.style.color = '#c53929';
         this.votes++;
         this.fire('get-vote');
+      },
+      _disabled: function() {
+          if(this.disabled)
+            this.$.voteButton.disabled = true;
+      },
+      _updatePercent() {
+          this.$.percentBar.style.height = Math.round((this.percent*300)/100) + "px";
+          console.log(this.$.percentBar.style.height);
       }
     });
   </script>

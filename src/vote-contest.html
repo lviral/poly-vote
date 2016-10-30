@@ -22,15 +22,35 @@
             font-size: small;
         }
     </style>
-    <div class="text title">{{title}}</div>
-    <vote-contestant image="http://placehold.it/500x500" name="Contestant 1" float="right" style="float:right;" bar-color="#7baaf7" 
-                     on-get-vote="_getVoteOne">
+      
+    <firebase-document
+      id="survey"
+      path="/users/0/surveys/0"
+      data="{{surveyData}}">
+    </firebase-document>
+      
+    <firebase-document
+      id="contestantOne"
+      path="/users/0/surveys/0/contestants/0"
+      data="{{oneData}}">
+    </firebase-document>  
+      
+    <firebase-document
+      id="contestantTwo"
+      path="/users/0/surveys/0/contestants/1"
+      data="{{twoData}}">
+    </firebase-document>
+    
+    <div class="text title">[[surveyData.title]]</div>
+    <vote-contestant image="{{oneData.image}}" name="{{oneData.name}}" float="right" style="float:right;" bar-color="#7baaf7" 
+                     on-get-vote="_getVoteOne" disabled="{{disableOne}}" votes="{{oneData.votes}}" percent="{{percentOne}}">
     </vote-contestant>
-    <vote-contestant image="http://placehold.it/300x300" name="Contestant 2" on-get-vote="_getVoteTwo"></vote-contestant>
+    <vote-contestant image="{{twoData.image}}" name="{{twoData.name}}" on-get-vote="_getVoteTwo" disabled="{{disableTwo}}" 
+                     votes="{{twoData.votes}}" percent="{{percentTwo}}"></vote-contestant>
     <br>
-    <div class="text date">{{date}}</div>
+    <div class="text date">[[surveyData.date]]</div>
     <br>
-    <div class="text">{{description}}</div>
+    <div class="text">[[surveyData.description]]</div>
   </template>
 
   <script>
@@ -38,21 +58,41 @@
         
       is: 'vote-contest',
       properties: {
-          title: String,
-          date: {
-              type: String,
-              value: ''
+          oneData: Object,
+          twoData: Object,
+          totalVotes: {
+              type: Number,
+              computed: '_getTotalVotes(oneData,twoData)'
           },
-          description: {
-              type: String,
-              value: ''
+          percentOne: {
+              type: Number,
+              computed: '_getPercentOne(totalVotes)'
+          },
+          percentTwo: {
+              type: Number,
+              computed: '_getPercentTwo(totalVotes)'
+          },
+          disableOne: {
+            type: Boolean
+          },
+          disableTwo: {
+            type: Boolean
           }
       },
       _getVoteOne: function() {
-          alert(1);
+          this.disableTwo = true;
       },
       _getVoteTwo: function() {
-          alert(2);
+          this.disableOne = true;
+      },
+      _getTotalVotes: function(oneData,twoData) {
+          return oneData.votes + twoData.votes;
+      },
+      _getPercentOne: function(totalVotes) {
+          return Math.round((this.oneData.votes * 100) / totalVotes);
+      },
+      _getPercentTwo: function(totalVotes) {
+          return Math.round((this.twoData.votes * 100) / totalVotes);
       }
     });
   </script>
