@@ -26,7 +26,7 @@
       <p style="margin-left:10px;">Surverys</p>
       
     <template is="dom-repeat" items="{{data}}" as="survey">
-      <paper-item>[[survey.title]]</paper-item>
+      <paper-item value="{{survey}}" on-tap="_getSurvey">[[survey.title]]</paper-item>
     </template>
       
   </template>
@@ -44,6 +44,9 @@
       },
       _setDbPath: function(user) {
           return '/users/' + this.user.uid + '/surveys';
+      },
+      _getSurvey: function(e) {
+          this.fire('select',e.target.value);
       }
     });
   </script>

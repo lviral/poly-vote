@@ -28,7 +28,7 @@
     <br><span>VS</span>
     <paper-input label="Name" value="{{nameTwo}}"></paper-input>
     <paper-button raised on-click="_create">Publish</paper-button>
-      
+    <paper-button raised on-click="_cancel">Cancel</paper-button>
   </template>
 
   <script>
@@ -65,10 +65,14 @@
          this.$.survey.data =  this.surveyData;
          this.$.survey.save(this.dbPath).then(()=> {
             this.$.survey.reset();
+            this.fire('close');
          });
       },
       _setDbPath: function(user) {
           return '/users/' + this.user.uid + '/surveys/';
+      },
+      _cancel: function() {
+          this.fire('close');
       }
     });
   </script>

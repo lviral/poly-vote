@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="vote-contestant.html">
 
 <dom-module id="vote-contest">
@@ -21,36 +22,25 @@
         .date {
             font-size: small;
         }
+        paper-fab {
+            position: absolute;
+            bottom: 1em;
+            right: 1em;
+        }
     </style>
-      
-    <firebase-document
-      id="survey"
-      path="/users/0/surveys/0"
-      data="{{surveyData}}">
-    </firebase-document>
-      
-    <firebase-document
-      id="contestantOne"
-      path="/users/0/surveys/0/contestants/0"
-      data="{{oneData}}">
-    </firebase-document>  
-      
-    <firebase-document
-      id="contestantTwo"
-      path="/users/0/surveys/0/contestants/1"
-      data="{{twoData}}">
-    </firebase-document>
-    
-    <div class="text title">[[surveyData.title]]</div>
+         
+    <div class="text title">[[title]]</div>
     <vote-contestant image="{{oneData.image}}" name="{{oneData.name}}" float="right" style="float:right;" bar-color="#7baaf7" 
                      on-get-vote="_getVoteOne" disabled="{{disableOne}}" votes="{{oneData.votes}}" percent="{{percentOne}}">
     </vote-contestant>
     <vote-contestant image="{{twoData.image}}" name="{{twoData.name}}" on-get-vote="_getVoteTwo" disabled="{{disableTwo}}" 
                      votes="{{twoData.votes}}" percent="{{percentTwo}}"></vote-contestant>
     <br>
-    <div class="text date">[[surveyData.date]]</div>
+    <div class="text date">[[date]]</div>
     <br>
-    <div class="text">[[surveyData.description]]</div>
+    <div class="text">[[description]]</div>
+    <paper-fab icon="icons:arrow-back" on-tap="_back" aria-label="Back"></paper-fab>
+
   </template>
 
   <script>
@@ -58,6 +48,9 @@
         
       is: 'vote-contest',
       properties: {
+          title: String,
+          date: String,
+          description: String,
           oneData: Object,
           twoData: Object,
           totalVotes: {
@@ -93,6 +86,9 @@
       },
       _getPercentTwo: function(totalVotes) {
           return Math.round((this.twoData.votes * 100) / totalVotes);
+      },
+      _back: function() {
+          this.fire('close');  
       }
     });
   </script>
