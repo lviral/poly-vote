@@ -1,53 +1,55 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
-
 <dom-module id="vote-contest-list">
-  <template>
-    <style>
-        :host {
-            display: block;
-            width: 100%;
-            color: gray;
-            margin: 0 auto;
-        }
-        paper-item {
-            border-bottom: 1px solid #ECECEC;
-            border-top: 1px solid #ECECEC;
-        }
-    </style>
+   <template>
+      <style>
+         :host {
+         display: block;
+         width: 100%;
+         color: gray;
+         margin: 0 auto;
+         }
+         paper-item {
+         border-bottom: 1px solid #ECECEC;
+         border-top: 1px solid #ECECEC;
+         }
+      </style>
       
-    <firebase-query
-        id="query"
-        app-name="polyvote"
-        path="[[dbPath]]"
-        data="{{data}}">
-    </firebase-query>
-
       <p style="margin-left:10px;">Surverys</p>
-      
-    <template is="dom-repeat" items="{{data}}" as="survey">
-      <paper-item value="{{survey}}" on-tap="_getSurvey">[[survey.title]]</paper-item>
-    </template>
-      
-  </template>
-
-  <script>
-    Polymer({
-        
-      is: 'vote-contest-list',
-      properties: {
-          user: Object,
-          dbPath: {
-              type: String,
-              computed: '_setDbPath(user)'
-          }
-      },
-      _setDbPath: function(user) {
-          return '/users/' + this.user.uid + '/surveys';
-      },
-      _getSurvey: function(e) {
-          this.fire('select',e.target.value);
-      }
-    });
-  </script>
+      <paper-listbox selected="{{selectedIndex}}">
+          <template is="dom-repeat" items="{{surveys}}" as="survey">
+             <paper-item value="{{survey}}" on-tap="_select">[[survey.title]]</paper-item>
+          </template>
+      </paper-listbox>
+      <array-selector id="selector" items="{{surveys}}" selected-item="{{selectedSurvey}}"></array-selector>
+   </template>
+   <script>
+      Polymer({
+        is: 'vote-contest-list',
+        properties: {
+            user: Object,
+            surveys: {
+                type: Array,
+                observer: '_surveysChanged'
+            },
+            selectedIndex: {
+                observer: '_selectedIndexChanged'
+            },
+            selectedSurvey: {
+                type: Object,
+                notify: true
+            }
+        },
+        _select: function(e) {
+            this.fire('select', e.target.value.$key);
+        },
+        _surveysChanged: function() {
+            this._selectedIndex = 0;
+        },
+        _selectedIndexChanged: function(idx) {
+            this.$.selector.select(this.surveys[idx]);
+        }
+      });
+   </script>
 </dom-module>

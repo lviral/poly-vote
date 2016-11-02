@@ -67,10 +67,13 @@
         }
     </style>
     <div class$="container {{float}}">
-        <iron-image sizing="cover" class="image-cover" alt="Contestant Cover." src="{{image}}"></iron-image>
-        <div style="color: {{textColor}}" class$="title {{textAlign}}">{{name}}<br>{{votes}}<br><span class="votes">votes</span></div>
+        <iron-image sizing="cover" class="image-cover" alt="Contestant Cover." src="{{contestant.image}}"></iron-image>
+        <div style="color: {{textColor}}" class$="title {{textAlign}}">
+            {{contestant.name}}<br>{{contestant.votes}}<br>
+            <span class="votes">votes</span>
+        </div>
         <div style="background-color:{{barColor}}" class="bar" id="percentBar"></div>
-        <paper-fab id="voteButton" noink mini icon="favorite" title="heart"  on-click="_getVote"></paper-fab>
+        <paper-fab id="btnVote" noink mini icon="favorite" title="heart" on-tap="_getVote"></paper-fab>
     </div>
   </template>
 
@@ -79,13 +82,10 @@
 
       is: 'vote-contestant',
       properties: {
-          name: String,
-          votes: {
-              type: Number,
-              value: 0,
-              notify: true
+          contestant: {
+              type: Object,
+              observer: '_updateContestant'
           },
-          image: String,
           textColor: {
               type: String,
               value: '#fff'
@@ -98,28 +98,37 @@
               type: String,
               value: 'left'
           },
-          disabled: {
+          state: {
               type: Boolean,
-              value: false,
-              observer: '_disabled'
+              value: 'active',
+              observer: '_changeState'
           },
-          percent: {
+          totalVotes: {
               type: Number,
-              observer: '_updatePercent'
+              value: 0
           }
       },
       _getVote: function(e) {
-        e.target.style.color = '#c53929';
-        this.votes++;
-        this.fire('get-vote');
+        this.fire('vote', this.contestant.id);
       },
-      _disabled: function() {
-          if(this.disabled)
-            this.$.voteButton.disabled = true;
+      _changeState: function() {
+          if(this.state == 'vote')
+              this.$.btnVote.style.color = '#c53929';
+          else if(this.state == 'no-vote')
+              this.$.btnVote.disabled = true;
+          else {
+              this.$.btnVote.style.color = '#FFF';
+              this.$.btnVote.disabled = false;
+          }
       },
-      _updatePercent() {
-          this.$.percentBar.style.height = Math.round((this.percent*300)/100) + "px";
-          console.log(this.$.percentBar.style.height);
+      _updateContestant: function() {
+         // this.state = 'active';
+          if(this.contestant) {
+              var percent = 0;
+              if(this.contestant.totalVotes != 0)
+                  percent = (this.contestant.votes*100) / this.totalVotes;
+              this.$.percentBar.style.height = Math.round((percent*300)/100) + "px";
+          }
       }
     });
   </script>

@@ -5,100 +5,117 @@
 <link rel="import" href="vote-editor.html">
 <link rel="import" href="vote-contest-list.html">
 <link rel="import" href="vote-contest.html">
-
 <dom-module id="poly-vote-app">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-      #social-net-links {
-        color:gray;
-        width: 100%;
-        margin: 0 auto;
-        margin-top: 20px;
-        text-align: center;
-        border-top:1px solid #ECECEC;
-        border-bottom: 1px solid #ECECEC;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        font-size: x-small;
-      }
-      #social-net-links span{
-          padding: 25px;
-      }
-      paper-fab {
-        position: absolute;
-        bottom: 1em;
-        right: 1em;
-      }
-    </style>
+   <template>
+      <style>
+         :host {
+         display: block;
+         }
+         #social-net-links {
+         color:gray;
+         width: 100%;
+         margin: 0 auto;
+         margin-top: 20px;
+         text-align: center;
+         border-top:1px solid #ECECEC;
+         border-bottom: 1px solid #ECECEC;
+         padding-top: 10px;
+         padding-bottom: 10px;
+         font-size: x-small;
+         }
+         #social-net-links span{
+         padding: 25px;
+         }
+         paper-fab {
+         position: absolute;
+         bottom: 1em;
+         right: 1em;
+         }
+      </style>
+      <firebase-app name="polyvote"
+         auth-domain="poly-vote-71ccc.firebaseapp.com"
+         database-url="https://poly-vote-71ccc.firebaseio.com"
+         api-key="AIzaSyCAct49Wg5EYLluplC9YNKodnYRHBUUfoI">
+      </firebase-app>
+      <firebase-auth id="auth" app-name="polyvote" provider="google" signed-in="{{signedIn}}" user="{{user}}"></firebase-auth>
+      <firebase-query
+         id="query"
+         app-name="polyvote"
+         path="/users/{{userId}}/surveys"
+         data="{{surveys}}">
+      </firebase-query>
+      <firebase-document
+        id="document"
+        app-name="polyvote"
+        path="/users/{{userId}}/surveys/{{surveyId}}"
+        data={{selectedSurvey}}>
+     </firebase-document>
+       
+      <na-toolbar signed-in="[[signedIn]]" on-sign-out="signOut"></na-toolbar>
+      <na-login on-sign-in="signIn" signed-in="[[signedIn]]" disabled="[[!online]]"></na-login>
+       
+      <vote-editor user="{{user}}" hidden$="{{hiddenEditor}}" on-close="_toogleView"></vote-editor>
+      <vote-contest-list user="{{user}}" surveys="{{surveys}}" hidden$="{{hiddenList}}"  on-select="_selectedSurveyChange"></vote-contest-list>
+      <vote-contest user="{{user}}"  survey="{{selectedSurvey}}" on-vote="_registerVote" hidden$="{{hiddenSurvey}}"></vote-contest>
+    
+      <paper-fab icon="add" on-tap="_toogleView" disabled="[[!online]]" aria-label="Add survey" hidden$="{{hiddenList}}"></paper-fab>
+      <paper-fab icon="icons:arrow-back" on-tap="_toogleSurvey" aria-label="Back" hidden$="{{hiddenSurvey}}"></paper-fab>
+
+   </template>
+   <script>
+      Polymer({
       
-    <firebase-app name="polyvote"
-          auth-domain="poly-vote-71ccc.firebaseapp.com"
-          database-url="https://poly-vote-71ccc.firebaseio.com"
-          api-key="AIzaSyCAct49Wg5EYLluplC9YNKodnYRHBUUfoI">
-    </firebase-app>
-      
-    <firebase-auth id="auth" app-name="polyvote" provider="google" signed-in="{{signedIn}}" user="{{user}}"></firebase-auth>
-    <na-toolbar signed-in="[[signedIn]]" on-sign-out="signOut"></na-toolbar>
-    <na-login on-sign-in="signIn" signed-in="[[signedIn]]" disabled="[[!online]]"></na-login>
-    <vote-editor user="{{user}}" hidden$="{{hiddenEditor}}" on-close="_toogleView"></vote-editor>
-    <vote-contest-list user="{{user}}" hidden$="{{hiddenList}}" on-select="_showSurvey"></vote-contest-list>
-    <paper-fab icon="add" on-tap="_toogleView" disabled="[[!online]]" aria-label="Add survey" hidden$="{{hiddenList}}"></paper-fab>
-    <div hidden$="{{hiddenSurvey}}"> 
-        <vote-contest title="{{title}}" date="{{date}}" description="{{description}}" one-data="{{one}}" two-data="{{two}}" 
-                      on-close="_toogleSurvey">
-        </vote-contest>
-        <div id="social-net-links">
-            <span>FACEBOOK</span>
-            <span>TWITTER</span>
-            <span>INSTAGRAM</span>
-        </div>
-    </div>
-  </template>
-
-  <script>
-    Polymer({
-
-      is: 'poly-vote-app',
-      properties: {
-          hiddenEditor: {
-              type: Boolean,
-              value: true
-          },
-          hiddenList: {
-              type: Boolean,
-              value: false
-          },
-          hiddenSurvey: {
-              type: Boolean,
-              value: true
-          }
-      },
-      signIn: function() {
-        this.$.auth.signInWithPopup();
-      },
-      signOut: function() {
-        this.$.auth.signOut();
-      },
-      _toogleView: function() {
-          this.hiddenEditor = !this.hiddenEditor;
-          this.hiddenList = !this.hiddenList;
-      },
-      _toogleSurvey: function() {
-          this.hiddenList = !this.hiddenList;
-          this.hiddenSurvey = !this.hiddenSurvey;
-      },
-      _showSurvey: function(e) {
-          this.title = e.detail.title;
-          this.date = e.detail.date;
-          this.description = e.detail.description;
-          this.one = e.detail.contestants[0];
-          this.two = e.detail.contestants[1];
-          this._toogleSurvey();
-      }
-
-    });
-  </script>
+        is: 'poly-vote-app',
+        properties: {
+            user: Object,
+            userId: {
+                type: String,
+                computed: '_setUserId(user)'
+            },
+            selectedSurvey: Object,
+            surveyId: String,
+            hiddenEditor: {
+                type: Boolean,
+                value: true
+            },
+            hiddenList: {
+                type: Boolean,
+                value: false
+            },
+            hiddenSurvey: {
+                type: Boolean,
+                value: true
+            }
+        },
+        signIn: function() {
+            this.$.auth.signInWithPopup();
+        },
+        signOut: function() {
+            this.$.auth.signOut();
+        },
+        _setUserId: function(user) {
+            if(this.user)
+                return  this.user.uid;
+        },
+        _setSurveyId: function(selectedSurvey) {
+            if(this.selectedSurvey)
+                return  this.selectedSurvey.$key;
+        },
+        _selectedSurveyChange: function(e) {
+            this.surveyId = e.detail,
+            this._toogleSurvey();
+        },
+        _toogleView: function() {
+            this.hiddenEditor = !this.hiddenEditor;
+            this.hiddenList = !this.hiddenList;
+        },
+        _toogleSurvey: function() {
+            this.hiddenList = !this.hiddenList;
+            this.hiddenSurvey = !this.hiddenSurvey;
+        },
+        _registerVote: function() {
+            this.$.document.save(this.$.query.path, this.surveyId);
+        }
+      });
+   </script>
 </dom-module>

@@ -49,17 +49,20 @@
       _create: function() {
           this.surveyData = {
               "contestants" : [ {
+                  "id": 1,
                   "image" : "http://placehold.it/500x500",
                   "name" : this.nameOne,
                   "votes" : 0
               }, {
+                  "id": 2,
                   "image" : "http://placehold.it/700x700",
                   "name" : this.nameTwo,
                   "votes" : 0
               } ],
               "date" : (new Date()).toLocaleDateString(),
               "description" : this.description,
-              "title" : this.title
+              "title" : this.title,
+              "totalVotes": 0
          };
          
          this.$.survey.data =  this.surveyData;
@@ -69,7 +72,8 @@
          });
       },
       _setDbPath: function(user) {
-          return '/users/' + this.user.uid + '/surveys/';
+          if(user)
+            return '/users/' + this.user.uid + '/surveys/';
       },
       _cancel: function() {
           this.fire('close');

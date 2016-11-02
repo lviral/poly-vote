@@ -28,18 +28,25 @@
             right: 1em;
         }
     </style>
-         
-    <div class="text title">[[title]]</div>
-    <vote-contestant image="{{oneData.image}}" name="{{oneData.name}}" float="right" style="float:right;" bar-color="#7baaf7" 
-                     on-get-vote="_getVoteOne" disabled="{{disableOne}}" votes="{{oneData.votes}}" percent="{{percentOne}}">
-    </vote-contestant>
-    <vote-contestant image="{{twoData.image}}" name="{{twoData.name}}" on-get-vote="_getVoteTwo" disabled="{{disableTwo}}" 
-                     votes="{{twoData.votes}}" percent="{{percentTwo}}"></vote-contestant>
+    
+    <div class="text title">[[survey.title]]</div>
+    
+    <template is="dom-repeat" items="{{survey.contestants}}" as="contestant">
+        <template is="dom-if" if="{{_floatRight(index)}}">
+            <vote-contestant contestant="{{contestant}}" total-votes="{{survey.totalVotes}}" 
+                             bar-color="#7baaf7" float="right" style="float:right;" on-vote="_registerVote">
+            </vote-contestant>
+        </template>
+        <template is="dom-if" if="{{!_floatRight(index)}}">
+            <vote-contestant contestant="{{contestant}}" total-votes="{{survey.totalVotes}}" on-vote="_registerVote"></vote-contestant>
+        </template>
+    </template>
+      
+      
+    <div class="text date">[[survey.date]]</div>
     <br>
-    <div class="text date">[[date]]</div>
-    <br>
-    <div class="text">[[description]]</div>
-    <paper-fab icon="icons:arrow-back" on-tap="_back" aria-label="Back"></paper-fab>
+    <div class="text">[[survey.description]]</div>
+
 
   </template>
 
@@ -48,47 +55,30 @@
         
       is: 'vote-contest',
       properties: {
-          title: String,
-          date: String,
-          description: String,
-          oneData: Object,
-          twoData: Object,
-          totalVotes: {
-              type: Number,
-              computed: '_getTotalVotes(oneData,twoData)'
-          },
-          percentOne: {
-              type: Number,
-              computed: '_getPercentOne(totalVotes)'
-          },
-          percentTwo: {
-              type: Number,
-              computed: '_getPercentTwo(totalVotes)'
-          },
-          disableOne: {
-            type: Boolean
-          },
-          disableTwo: {
-            type: Boolean
-          }
+          survey: Object
       },
-      _getVoteOne: function() {
-          this.disableTwo = true;
+      _registerVote: function(e) {
+          
+          var selectedId = e.detail;
+          var contestantsList = Polymer.dom(this.root).querySelectorAll('vote-contestant');
+          
+          contestantsList.forEach(function(item){
+              if(item.contestant.id == selectedId) {
+                item.state = 'vote';
+                item.contestant.votes++;
+              }
+              else 
+                item.state = 'no-vote';
+          });
+          
+          this.survey.totalVotes++;
+          
+          this.fire('vote');
       },
-      _getVoteTwo: function() {
-          this.disableOne = true;
-      },
-      _getTotalVotes: function(oneData,twoData) {
-          return oneData.votes + twoData.votes;
-      },
-      _getPercentOne: function(totalVotes) {
-          return Math.round((this.oneData.votes * 100) / totalVotes);
-      },
-      _getPercentTwo: function(totalVotes) {
-          return Math.round((this.twoData.votes * 100) / totalVotes);
-      },
-      _back: function() {
-          this.fire('close');  
+      _floatRight: function(index) {
+          if(index==0)
+              return true;
+          return false;
       }
     });
   </script>
