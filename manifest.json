@@ -2,5 +2,38 @@
   "name": "poly-vote",
   "short_name": "poly-vote",
   "start_url": "/",
-  "display": "standalone"
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#BDBDBD",
+  "background_color": "#EEEEEE",
+  "icons": [{
+    "src": "images/icons/icon-36x36.png",
+    "sizes": "36x36",
+    "type": "image/png"
+  },
+  {
+    "src": "images/icons/icon-48x48.png",
+    "sizes": "48x48",
+    "type": "image/png"
+  },
+  {
+    "src": "images/icons/icon-72x72.png",
+    "sizes": "72x72",
+    "type": "image/png"
+  },
+  {
+    "src": "images/icons/icon-96x96.png",
+    "sizes": "96x96",
+    "type": "image/png"
+  },
+  {
+    "src": "images/icons/icon-144x144.png",
+    "sizes": "144x144",
+    "type": "image/png"
+  },
+  {
+    "src": "images/icons/icon-192x192.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
 }

@@ -79,6 +79,11 @@
           if(index==0)
               return true;
           return false;
+      },
+      _initSurvey: function() {
+          Polymer.dom(this.root).querySelectorAll('vote-contestant').forEach(function(item){
+              item.state = 'active';
+          });
       }
     });
   </script>

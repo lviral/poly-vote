@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
 <link rel="import" href="../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../bower_components/note-app-elements/na-toolbar.html">
 <link rel="import" href="../bower_components/note-app-elements/na-login.html">
@@ -32,6 +33,12 @@
          right: 1em;
          }
       </style>
+      <app-indexeddb-mirror
+         session="[[user.uid]]"
+         key="dbSurveys"
+         data="{{surveys}}"
+         persisted-data="{{persistedSurveys}}">
+      </app-indexeddb-mirror>
       <firebase-app name="polyvote"
          auth-domain="poly-vote-71ccc.firebaseapp.com"
          database-url="https://poly-vote-71ccc.firebaseio.com"
@@ -55,8 +62,9 @@
       <na-login on-sign-in="signIn" signed-in="[[signedIn]]" disabled="[[!online]]"></na-login>
        
       <vote-editor user="{{user}}" hidden$="{{hiddenEditor}}" on-close="_toogleView"></vote-editor>
-      <vote-contest-list user="{{user}}" surveys="{{surveys}}" hidden$="{{hiddenList}}"  on-select="_selectedSurveyChange"></vote-contest-list>
-      <vote-contest user="{{user}}"  survey="{{selectedSurvey}}" on-vote="_registerVote" hidden$="{{hiddenSurvey}}"></vote-contest>
+      <vote-contest-list user="{{user}}" surveys="{{persistedSurveys}}" hidden$="{{hiddenList}}"  on-select="_selectedSurveyChange">
+      </vote-contest-list>
+      <vote-contest id="contest" user="{{user}}"  survey="{{selectedSurvey}}" on-vote="_registerVote" hidden$="{{hiddenSurvey}}"></vote-contest>
     
       <paper-fab icon="add" on-tap="_toogleView" disabled="[[!online]]" aria-label="Add survey" hidden$="{{hiddenList}}"></paper-fab>
       <paper-fab icon="icons:arrow-back" on-tap="_toogleSurvey" aria-label="Back" hidden$="{{hiddenSurvey}}"></paper-fab>
@@ -73,7 +81,10 @@
                 computed: '_setUserId(user)'
             },
             selectedSurvey: Object,
-            surveyId: String,
+            surveyId: {
+                type: String,
+                observer: '_surveyIdChange'
+            },
             hiddenEditor: {
                 type: Boolean,
                 value: true
@@ -115,6 +126,9 @@
         },
         _registerVote: function() {
             this.$.document.save(this.$.query.path, this.surveyId);
+        },
+        _surveyIdChange: function() {
+            this.$.contest._initSurvey();
         }
       });
    </script>
