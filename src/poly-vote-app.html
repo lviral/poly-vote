@@ -1,135 +1,213 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../bower_components/note-app-elements/na-toolbar.html">
 <link rel="import" href="../bower_components/note-app-elements/na-login.html">
-<link rel="import" href="vote-editor.html">
+<!--<link rel="import" href="vote-editor.html">
 <link rel="import" href="vote-contest-list.html">
-<link rel="import" href="vote-contest.html">
+<link rel="import" href="vote-contest.html">-->
 <dom-module id="poly-vote-app">
-   <template>
-      <style>
-         :host {
-         display: block;
-         }
-         #social-net-links {
-         color:gray;
-         width: 100%;
-         margin: 0 auto;
-         margin-top: 20px;
-         text-align: center;
-         border-top:1px solid #ECECEC;
-         border-bottom: 1px solid #ECECEC;
-         padding-top: 10px;
-         padding-bottom: 10px;
-         font-size: x-small;
-         }
-         #social-net-links span{
-         padding: 25px;
-         }
-         paper-fab {
-         position: absolute;
-         bottom: 1em;
-         right: 1em;
-         }
-      </style>
-      <app-indexeddb-mirror
-         session="[[user.uid]]"
-         key="dbSurveys"
-         data="{{surveys}}"
-         persisted-data="{{persistedSurveys}}">
-      </app-indexeddb-mirror>
-      <firebase-app name="polyvote"
-         auth-domain="poly-vote-71ccc.firebaseapp.com"
-         database-url="https://poly-vote-71ccc.firebaseio.com"
-         api-key="AIzaSyCAct49Wg5EYLluplC9YNKodnYRHBUUfoI">
-      </firebase-app>
-      <firebase-auth id="auth" app-name="polyvote" provider="google" signed-in="{{signedIn}}" user="{{user}}"></firebase-auth>
-      <firebase-query
-         id="query"
-         app-name="polyvote"
-         path="/users/{{userId}}/surveys"
-         data="{{surveys}}">
-      </firebase-query>
-      <firebase-document
-        id="document"
-        app-name="polyvote"
-        path="/users/{{userId}}/surveys/{{surveyId}}"
-        data={{selectedSurvey}}>
-     </firebase-document>
-       
-      <na-toolbar signed-in="[[signedIn]]" on-sign-out="signOut"></na-toolbar>
-      <na-login on-sign-in="signIn" signed-in="[[signedIn]]" disabled="[[!online]]"></na-login>
-       
-      <vote-editor user="{{user}}" hidden$="{{hiddenEditor}}" on-close="_toogleView"></vote-editor>
-      <vote-contest-list user="{{user}}" surveys="{{persistedSurveys}}" hidden$="{{hiddenList}}"  on-select="_selectedSurveyChange">
-      </vote-contest-list>
-      <vote-contest id="contest" user="{{user}}"  survey="{{selectedSurvey}}" on-vote="_registerVote" hidden$="{{hiddenSurvey}}"></vote-contest>
-    
-      <paper-fab icon="add" on-tap="_toogleView" disabled="[[!online]]" aria-label="Add survey" hidden$="{{hiddenList}}"></paper-fab>
-      <paper-fab icon="icons:arrow-back" on-tap="_toogleSurvey" aria-label="Back" hidden$="{{hiddenSurvey}}"></paper-fab>
-
-   </template>
-   <script>
-      Polymer({
-      
-        is: 'poly-vote-app',
-        properties: {
-            user: Object,
-            userId: {
-                type: String,
-                computed: '_setUserId(user)'
-            },
-            selectedSurvey: Object,
-            surveyId: {
-                type: String,
-                observer: '_surveyIdChange'
-            },
-            hiddenEditor: {
-                type: Boolean,
-                value: true
-            },
-            hiddenList: {
-                type: Boolean,
-                value: false
-            },
-            hiddenSurvey: {
-                type: Boolean,
-                value: true
+    <template>
+        <style>
+            :host {
+                --app-primary-color: #4285f4;
+                --app-secondary-color: black;
+                display: block;
             }
-        },
-        signIn: function() {
-            this.$.auth.signInWithPopup();
-        },
-        signOut: function() {
-            this.$.auth.signOut();
-        },
-        _setUserId: function(user) {
-            if(this.user)
-                return  this.user.uid;
-        },
-        _setSurveyId: function(selectedSurvey) {
-            if(this.selectedSurvey)
-                return  this.selectedSurvey.$key;
-        },
-        _selectedSurveyChange: function(e) {
-            this.surveyId = e.detail,
-            this._toogleSurvey();
-        },
-        _toogleView: function() {
-            this.hiddenEditor = !this.hiddenEditor;
-            this.hiddenList = !this.hiddenList;
-        },
-        _toogleSurvey: function() {
-            this.hiddenList = !this.hiddenList;
-            this.hiddenSurvey = !this.hiddenSurvey;
-        },
-        _registerVote: function() {
-            this.$.document.save(this.$.query.path, this.surveyId);
-        },
-        _surveyIdChange: function() {
-            this.$.contest._initSurvey();
-        }
-      });
-   </script>
+            app-header {
+                color: #fff;
+                background-color: var(--app-primary-color);
+            }
+            app-header paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+            .drawer-list a {
+                display: inline-block;
+                text-decoration: none;
+                color: var(--app-primary-color);
+                line-height: 40px;
+                width: 19%;
+                text-align: center;
+            }
+            .drawer-list a.iron-selected {
+                color: black;
+                font-weight: bold;
+            }
+            
+            paper-material  {
+                width: 100%;
+                height: 50px;
+                position: fixed;
+                bottom: 0;
+                background: white;
+                border-top: 1px solid grey;
+            }
+            paper-icon-button {
+                padding: 0;
+            }
+        </style>
+        <app-indexeddb-mirror
+            session="[[user.uid]]"
+            key="dbSurveys"
+            data="{{surveys}}"
+            persisted-data="{{persistedSurveys}}">
+        </app-indexeddb-mirror>
+        <firebase-app name="polyvote"
+            auth-domain="poly-vote-71ccc.firebaseapp.com"
+            database-url="https://poly-vote-71ccc.firebaseio.com"
+            api-key="AIzaSyCAct49Wg5EYLluplC9YNKodnYRHBUUfoI">
+        </firebase-app>
+        <firebase-auth id="auth" app-name="polyvote" provider="google" signed-in="{{signedIn}}" user="{{user}}"></firebase-auth>
+        <firebase-query
+            id="query"
+            app-name="polyvote"
+            path="/users/{{userId}}/surveys"
+            data="{{surveys}}">
+        </firebase-query>
+        <firebase-document
+            id="document"
+            app-name="polyvote"
+            path="/users/{{userId}}/surveys/{{surveyId}}"
+            data={{selectedSurvey}}>
+        </firebase-document>
+        <na-toolbar signed-in="[[signedIn]]" on-sign-out="signOut"></na-toolbar>
+        <na-login on-sign-in="signIn" signed-in="[[signedIn]]" disabled="[[!online]]"></na-login>
+        <!--<vote-editor user="{{user}}" hidden$="{{hiddenEditor}}" on-close="_toogleView"></vote-editor>
+            <vote-contest-list user="{{user}}" surveys="{{persistedSurveys}}" hidden$="{{hiddenList}}"  on-select="_selectedSurveyChange">
+            </vote-contest-list>
+            <vote-contest id="contest" user="{{user}}"  survey="{{selectedSurvey}}" on-vote="_registerVote" hidden$="{{hiddenSurvey}}"></vote-contest>
+            
+            <paper-fab icon="add" on-tap="_toogleView" disabled="[[!online]]" aria-label="Add survey" hidden$="{{hiddenList}}"></paper-fab>
+            <paper-fab icon="icons:arrow-back" on-tap="_toogleSurvey" aria-label="Back" hidden$="{{hiddenSurvey}}"></paper-fab>-->
+        
+        <app-location route="{{route}}"></app-location>
+        <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}"></app-route>
+        <app-drawer-layout>
+            <iron-pages
+                selected="[[page]]"
+                attr-for-selected="name"
+                fallback-selection="view404"
+                role="main">
+                <view-home name="home"></view-home>
+                <view-discover name="discover"></view-discover>
+                <view-photo name="photo"></view-photo>
+                <view-notifications name="notifications"></view-notifications>
+                <view-profile name="profile"></view-profile>
+                <view-404 name="404"></my-view404>
+            </iron-pages>
+            <paper-material elevation="4">
+                <footer>
+                    <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+                        <a name="home" href="/home">
+                            <paper-icon-button icon="home"></paper-icon-button>
+                        </a>
+                        <a name="discover" href="/discover">
+                            <paper-icon-button icon="social:poll"></paper-icon-button>
+                        </a>
+                        <a name="photo" href="/photo">
+                            <paper-icon-button icon="camera-enhance"></paper-icon-button>
+                        </a>
+                        <a name="notifications" href="/notifications">
+                            <paper-icon-button icon="social:notifications"></paper-icon-button>
+                        </a>
+                        <a name="profile" href="/profile">
+                            <paper-icon-button icon="social:person"></paper-icon-button>
+                        </a> 
+                    </iron-selector>
+                </footer>
+            </paper-material>
+        </app-drawer-layout>
+    </template>
+    <script>
+        Polymer({
+        
+          is: 'poly-vote-app',
+          properties: {
+              page: {
+                  type: String,
+                  reflectToAttribute: true,
+                  observer: '_pageChanged'
+              },
+              user: Object,
+              userId: {
+                  type: String,
+                  computed: '_setUserId(user)'
+              },
+              selectedSurvey: Object,
+              surveyId: {
+                  type: String,
+                  observer: '_surveyIdChange'
+              },
+              hiddenEditor: {
+                  type: Boolean,
+                  value: true
+              },
+              hiddenList: {
+                  type: Boolean,
+                  value: false
+              },
+              hiddenSurvey: {
+                  type: Boolean,
+                  value: true
+              }
+          },
+          observers: [
+            '_routePageChanged(routeData.page)'
+          ],
+           _routePageChanged: function(page) {
+            this.page = page || 'photo';
+          },
+          _pageChanged: function(page) {
+            // Load page import on demand. Show 404 page if fails
+            var resolvedPageUrl = this.resolveUrl('view-' + page + '.html');
+            this.importHref(resolvedPageUrl, null, this._showPage404, true);
+          },
+          _showPage404: function() {
+            this.page = '404';
+          },
+          signIn: function() {
+              this.$.auth.signInWithPopup();
+          },
+          signOut: function() {
+              this.$.auth.signOut();
+          },
+          _setUserId: function(user) {
+              if(this.user)
+                  return  this.user.uid;
+          },
+          _setSurveyId: function(selectedSurvey) {
+              if(this.selectedSurvey)
+                  return  this.selectedSurvey.$key;
+          },
+          _selectedSurveyChange: function(e) {
+              this.surveyId = e.detail,
+              this._toogleSurvey();
+          },
+          _toogleView: function() {
+              this.hiddenEditor = !this.hiddenEditor;
+              this.hiddenList = !this.hiddenList;
+          },
+          _toogleSurvey: function() {
+              this.hiddenList = !this.hiddenList;
+              this.hiddenSurvey = !this.hiddenSurvey;
+          },
+          _registerVote: function() {
+              this.$.document.save(this.$.query.path, this.surveyId);
+          },
+          _surveyIdChange: function() {
+              this.$.contest._initSurvey();
+          }
+        });
+    </script>
 </dom-module>
