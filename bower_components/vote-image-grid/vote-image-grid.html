@@ -160,7 +160,7 @@ Image grid
                                exit-animation='slide-right-animation'>
               <neon-animatable key='one'>
                   <div class="image-container">
-                      <vote-image-placeholder mode="add"></vote-image-placeholder>
+                      <vote-image-placeholder mode="add" image-data="{{imageOneOne}}"></vote-image-placeholder>
                   </div>
               </neon-animatable>
               <neon-animatable key='two'>
@@ -193,8 +193,8 @@ Image grid
                   </div>
               </neon-animatable>
           </neon-animated-pages>
-          <div class="footer">
-          </div>
+          <!--<div class="footer">
+          </div>-->
       </div>
   </template>
 
@@ -206,7 +206,13 @@ Image grid
         attached: function() {
             this.$$('paper-tabs').style.height = this.$$('paper-tabs paper-tab').clientWidth + 'px';
             this.$$('neon-animated-pages').style.height = 
-                this.$.container.clientHeight - (this.$$('paper-tabs').clientHeight + this.$$('.footer').clientHeight) + 'px';
+                this.$.container.clientHeight - (this.$$('paper-tabs').clientHeight /*+ this.$$('.footer').clientHeight*/) + 'px';
+        },
+        getImages: function() {
+            var imageList = Polymer.dom(this.root).querySelectorAll('neon-animated-pages .iron-selected vote-image-placeholder');
+            imageList.forEach(function(item){
+                console.log(item.mode);
+            });
         }
     });
   </script>
