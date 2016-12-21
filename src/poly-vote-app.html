@@ -62,7 +62,9 @@
         <firebase-app name="polyvote"
             auth-domain="poly-vote-71ccc.firebaseapp.com"
             database-url="https://poly-vote-71ccc.firebaseio.com"
-            api-key="AIzaSyCAct49Wg5EYLluplC9YNKodnYRHBUUfoI">
+            api-key="AIzaSyCAct49Wg5EYLluplC9YNKodnYRHBUUfoI"
+            storage-bucket="poly-vote-71ccc.appspot.com"
+            >
         </firebase-app>
         <firebase-auth id="auth" app-name="polyvote" provider="google" signed-in="{{signedIn}}" user="{{user}}"></firebase-auth>
         <firebase-query
@@ -101,7 +103,7 @@
                 role="main">
                 <view-home name="home"></view-home>
                 <view-discover name="discover"></view-discover>
-                <view-photo name="photo"></view-photo>
+                <view-photo name="photo" user="{{user}}" on-survey-added="_newSurveyAdded"></view-photo>
                 <view-notifications name="notifications"></view-notifications>
                 <view-profile name="profile"></view-profile>
                 <view-404 name="404"></my-view404>
@@ -207,6 +209,9 @@
           },
           _surveyIdChange: function() {
               this.$.contest._initSurvey();
+          },
+          _newSurveyAdded: function() {
+              this.page = 'home';
           }
         });
     </script>

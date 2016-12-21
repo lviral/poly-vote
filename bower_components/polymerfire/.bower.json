@@ -1,6 +1,5 @@
 {
   "name": "polymerfire",
-  "version": "0.10.2",
   "authors": [
     "Firebase"
   ],
@@ -27,14 +26,14 @@
     "web-component-tester": "^4.0.0",
     "note-app-elements": "polymerlabs/note-app-elements"
   },
-  "_release": "0.10.2",
+  "_release": "8c2e09bd27",
   "_resolution": {
-    "type": "version",
-    "tag": "v0.10.2",
-    "commit": "18ef3d839974e4e5f2dbcd2a1eecf4428537ad65"
+    "type": "branch",
+    "branch": "adding-firebase-storage",
+    "commit": "8c2e09bd27fcf5e06ef5fbcb0deab020a2a46d26"
   },
-  "_source": "git://github.com/firebase/polymerfire.git",
-  "_target": "^0.10.2",
-  "_originalSource": "firebase/polymerfire",
+  "_source": "https://github.com/tjmonsi/polymerfire.git",
+  "_target": "adding-firebase-storage",
+  "_originalSource": "https://github.com/tjmonsi/polymerfire.git",
   "_direct": true
 }

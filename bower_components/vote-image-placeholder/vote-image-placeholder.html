@@ -66,7 +66,7 @@ Image place holder for photos and images
                   type: Boolean,
                   computed: '_setHiddenAdd(mode)'
               },
-              imageData: {
+              file: {
                   type: String,
                   value: ''
               },
@@ -101,7 +101,7 @@ Image place holder for photos and images
           },
           _changeFile: function(e) {
               var canvas = this.$.image;
-              var file = e.target.files[0];
+              this.file = e.target.files[0];
               var fr = new FileReader();
               fr.onloadend = function(e) {
                   var img = new Image();
@@ -111,13 +111,9 @@ Image place holder for photos and images
                       var ctx = canvas.getContext("2d");
                       ctx.drawImage(e.target,0,0);
                   };
-                  this.imageData = e.target.result;
-                  img.src = this.imageData;
-                  
-                  console.log(this.imageData);
+                  img.src = e.target.result;
               }
-              fr.readAsDataURL(file);
-              
+              fr.readAsDataURL(this.file);
               this.mode = 'edit';
           },
           _deleteImage: function() {
@@ -125,9 +121,6 @@ Image place holder for photos and images
               var ctx= canvas.getContext('2d');
               ctx.rect(0,0,canvas.width,canvas.height);
               this.mode = 'add';
-          },
-          _getImageData: function() {
-              return this.imageData;
           }
       });
   </script>

@@ -1,37 +1,101 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/vote-image-grid/vote-image-grid.html">
-
-
+<link rel="import" href="../bower_components/polymerfire/firebase-storage.html">
 <dom-module id="view-photo">
-  <template>
-    <style>
-      :host {
-        display: block;
-        padding: 10px;
-        height: calc(100vh - 230px);
-      }
-      paper-button {
-          margin-top: 10px;
-          float: right;
-      }
-    </style>
-    
-    <paper-input label="Write a question..."></paper-input>
-    <vote-image-grid id="images" mode="add"></vote-image-grid>
-    <paper-button raised on-tap="_publish"><iron-icon icon="send"></iron-icon>Publish</paper-button>
-    
-  </template>
+    <template>
+        <style>
+            :host {
+            display: block;
+            padding: 10px;
+            height: calc(100vh - 230px);
+            }
+            paper-button {
+            margin-top: 10px;
+            float: right;
+            }
+        </style>
+        <firebase-document id="docSurvey" app-name="polyvote" data="{{dataSurvey}}"></firebase-document>
+        <firebase-document id="docUser" app-name="polyvote" data="{{dataUser}}"></firebase-document>
+        <firebase-document id="docItem" app-name="polyvote" data="{{dataItem}}" sequential-transactions="true"></firebase-document>
+        
+        <firebase-storage id="storage" app-name="polyvote"></firebase-storage>
 
-  <script>
-    Polymer({
-      is: 'view-photo',
-      _publish: function() {
-          this.$.images.getImages();
-      }
-    });
-  </script>
+        <paper-input label="Write a question..." value="{{description}}"></paper-input>
+        <vote-image-grid id="images" mode="add" images-files="{{imagesFiles}}"></vote-image-grid>
+        <paper-button raised on-tap="_publish">
+            <iron-icon icon="send"></iron-icon>Publish
+        </paper-button>
+        <paper-toast id="opMessage"  text="Survey added sucessfully!"></paper-toast>
+    </template>
+    <script>
+        Polymer({
+          is: 'view-photo',
+          properties: {
+              user: Object,
+              description: String,
+              docSurvey: String
+          },
+          _publish: function() {
+              this._saveSurvey();
+          },
+          _saveSurvey: function() {
+              this.dataSurvey = {
+                  'date' : (new Date()).toLocaleDateString(),
+                  'description' : this.description,
+                  'totalVotes': 0,
+                  'user': this.user.uid
+              };
+              this.$.docSurvey.save('/surveys/').then(()=>{
+                 var surveyPath = this.$.docSurvey.path,
+                     itemPath = surveyPath + '/items/'
+                 this._associateSurveyToUser(surveyPath);
+                 this.$.docSurvey.reset();
+                  
+                 var imagesFiles = this.$.images._getImages();
+                 console.log(imagesFiles);
+                 
+                 let requests = imagesFiles.reduce((promiseChain, item) => {
+                    return promiseChain.then(() => new Promise((resolve) => {
+                        this._saveImageReference(itemPath, item, resolve);
+                    }));
+                  }, Promise.resolve());
+                  
+                  requests.then(() => {
+                      console.log('done'); 
+                      this.$.opMessage.open();
+                      setTimeout(()=> { 
+                        this.fire('survey-added');
+                      }, 3000);
+                      
+                  });
+              }); 
+          },
+          _associateSurveyToUser: function(surveyPath) {
+              this.dataUser = true;
+              var userPath = '/user/' + this.user.uid;
+              this.$.docUser.save(userPath,surveyPath).then(()=>{
+                  this.$.docUser.reset();
+              });
+          },
+          _saveImageReference: function(path,image,cb) {
+              console.log(image);
+              this.$.docItem.data = {'votes': 0};
+              this.$.docItem.save(path).then(()=>{
+                  console.log(this.$.docItem.path);
+                   this.$.storage.files = image;
+                   this.$.storage.path = '/images' + this.$.docItem.path;
+                   this.$.storage.upload();
+                   this.$.storage.reset();
+                   this.$.docItem.reset();
+                   cb();
+              });
+          }
+          
+        });
+    </script>
 </dom-module>
